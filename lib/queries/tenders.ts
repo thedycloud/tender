@@ -6,7 +6,10 @@ import {
   getTenderPagination,
   TenderQueryParams,
   toIsoString,
+  TENDER_STATUSES,
+  getDueSoonWhere,
 } from "./tender-utils";
+import type { TenderStatsDTO } from "@/types/tender";
 
 export const tenderListSelect = {
   id: true,
@@ -108,5 +111,107 @@ export async function getTenders(
     page: pagination.page,
     pageSize: pagination.pageSize,
     totalPages: pagination.totalPages,
+  };
+}
+
+export const tenderDetailSelect = {
+  ...tenderListSelect,
+  documents: {
+    select: {
+      id: true,
+      name: true,
+      fileName: true,
+      fileSize: true,
+      mimeType: true,
+      status: true,
+      tenderId: true,
+      categoryId: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+  },
+} satisfies Prisma.TenderSelect;
+
+export type TenderDetailRecord = Prisma.TenderGetPayload<{
+  select: typeof tenderDetailSelect;
+}>;
+
+export type TenderDocumentDTO = Omit<
+  TenderDetailRecord["documents"][number],
+  "createdAt" | "updatedAt"
+> & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TenderDetailDTO = Omit<
+  TenderDetailRecord,
+  "deadlineAt" | "publishedAt" | "createdAt" | "updatedAt" | "documents"
+> & {
+  deadlineAt: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  documents: TenderDocumentDTO[];
+};
+
+export async function getTenderDetail(
+  id: string,
+): Promise<TenderDetailDTO | null> {
+  const tender = await prisma.tender.findUnique({
+    where: { id },
+    select: tenderDetailSelect,
+  });
+
+  if (!tender) {
+    return null;
+  }
+
+  return {
+    ...tender,
+    deadlineAt: toIsoString(tender.deadlineAt),
+    publishedAt: toIsoString(tender.publishedAt),
+    createdAt: toIsoString(tender.createdAt) ?? tender.createdAt.toISOString(),
+    updatedAt: toIsoString(tender.updatedAt) ?? tender.updatedAt.toISOString(),
+    documents: tender.documents.map((document) => ({
+      ...document,
+      createdAt: toIsoString(document.createdAt) ?? document.createdAt.toISOString(),
+      updatedAt: toIsoString(document.updatedAt) ?? document.updatedAt.toISOString(),
+    })),
+  };
+}
+
+export async function getTenderStats(
+  now: Date = new Date(),
+): Promise<TenderStatsDTO> {
+  const [total, dueSoon, grouped] = await prisma.$transaction([
+    prisma.tender.count(),
+    prisma.tender.count({
+      where: getDueSoonWhere(now),
+    }),
+    prisma.tender.groupBy({
+      by: ["status"],
+      _count: { status: true },
+      orderBy: { status: "asc" },
+    }),
+  ]);
+
+  const byStatus = Object.fromEntries(
+    TENDER_STATUSES.map((status) => [status, 0]),
+  ) as TenderStatsDTO["byStatus"];
+
+  for (const group of grouped) {
+    const statusCount =
+      typeof group._count === "object" && group._count !== null
+        ? group._count.status
+        : undefined;
+    byStatus[group.status] = statusCount ?? 0;
+  }
+
+  return {
+    total,
+    byStatus,
+    dueSoon,
   };
 }
