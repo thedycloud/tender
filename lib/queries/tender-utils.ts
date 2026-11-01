@@ -15,13 +15,20 @@ export const ACTIVE_TENDER_STATUSES = [
   "CLOSING_SOON",
 ] as const satisfies readonly TenderStatus[];
 
-export const SORT_FIELDS = ["newest", "oldest", "deadline", "title"] as const;
+export const SORT_FIELDS = [
+  "newest",
+  "oldest",
+  "deadline",
+  "title",
+  "title_asc",
+  "title_desc",
+] as const;
 
 export interface TenderQueryParams {
   q?: string;
   status?: TenderStatus | "ALL";
   category?: string;
-  sort?: "newest" | "oldest" | "deadline" | "title";
+  sort?: "newest" | "oldest" | "deadline" | "title" | "title_asc" | "title_desc";
   page?: number;
 }
 
@@ -70,7 +77,10 @@ export function buildTenderOrderBy(
     case "deadline":
       return { deadlineAt: "asc" };
     case "title":
+    case "title_asc":
       return { title: "asc" };
+    case "title_desc":
+      return { title: "desc" };
     case "newest":
     default:
       return { createdAt: "desc" };
