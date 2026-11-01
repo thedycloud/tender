@@ -6,6 +6,8 @@ import {
   normalizeTenderPage,
   TENDER_PAGE_SIZE,
   toIsoString,
+  ACTIVE_TENDER_STATUSES,
+  getDueSoonWhere,
 } from "./tender-utils";
 
 describe("tender query utilities", () => {
@@ -65,5 +67,22 @@ describe("tender query utilities", () => {
       "2026-11-01T00:00:00.000Z",
     );
     expect(toIsoString(null)).toBeNull();
+  });
+
+  it("exports only published active tender statuses", () => {
+    expect(ACTIVE_TENDER_STATUSES).toEqual(["OPEN", "CLOSING_SOON"]);
+  });
+
+  it("builds a due-soon query for the next 7 days and active statuses", () => {
+    const now = new Date("2026-11-01T00:00:00.000Z");
+    const where = getDueSoonWhere(now, 7);
+
+    expect(where.status).toEqual({
+      in: ["OPEN", "CLOSING_SOON"],
+    });
+    expect(where.deadlineAt).toEqual({
+      gte: now,
+      lte: new Date("2026-11-08T00:00:00.000Z"),
+    });
   });
 });

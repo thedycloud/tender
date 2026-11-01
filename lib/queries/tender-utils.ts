@@ -2,6 +2,21 @@ import { Prisma, TenderStatus } from "@prisma/client";
 
 export const TENDER_PAGE_SIZE = 20;
 
+export const TENDER_STATUSES = [
+  "DRAFT",
+  "OPEN",
+  "CLOSING_SOON",
+  "CLOSED",
+  "CANCELLED",
+] as const satisfies readonly TenderStatus[];
+
+export const ACTIVE_TENDER_STATUSES = [
+  "OPEN",
+  "CLOSING_SOON",
+] as const satisfies readonly TenderStatus[];
+
+export const SORT_FIELDS = ["newest", "oldest", "deadline", "title"] as const;
+
 export interface TenderQueryParams {
   q?: string;
   status?: TenderStatus | "ALL";
@@ -95,4 +110,20 @@ export function toIsoString(
   }
 
   return value.toISOString();
+}
+
+export function getDueSoonWhere(
+  now: Date = new Date(),
+  withinDays = 7,
+): Prisma.TenderWhereInput {
+  const end = new Date(now);
+  end.setUTCDate(end.getUTCDate() + withinDays);
+
+  return {
+    status: { in: [...ACTIVE_TENDER_STATUSES] },
+    deadlineAt: {
+      gte: now,
+      lte: end,
+    },
+  };
 }
