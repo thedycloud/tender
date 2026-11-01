@@ -10,6 +10,8 @@ import type { TenderQuery } from "@/schemas/tender-query";
 import type { TenderSortValue } from "@/lib/tender-sort";
 import { SortableHead } from "./sortable-head";
 import { TenderRow } from "./tender-row";
+import { TenderCard } from "./tender-card";
+import { getNextTenderSort } from "@/lib/tender-sort";
 
 interface TenderTableProps {
   items: TenderListItemDTO[];
@@ -47,55 +49,73 @@ export function TenderTable({ items, query }: TenderTableProps) {
     return (
       <div className="p-4">
         <EmptyState
-          variant={query.q || query.status !== "ALL" || query.category ? "no-results" : "initial"}
+          variant={
+            query.q || query.status !== "ALL" || query.category
+              ? "no-results"
+              : "initial"
+          }
         />
       </div>
     );
   }
 
+  const tenderHref = (tenderId: string) =>
+    buildQueryUrl(query, { tender: tenderId });
+  const titleSort = getNextTenderSort(query.sort, "title");
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <SortableHead
-            label="Judul"
-            sort={query.sort as TenderSortValue}
-            buildHref={(sort) =>
-              buildQueryUrl(query, {
-                sort,
-                page: null,
-              })
-            }
-            className="min-w-64"
-          />
-          <th className="h-10 min-w-28 px-3 text-left align-middle font-medium text-zinc-500">
-            Kode
-          </th>
-          <th className="h-10 min-w-40 px-3 text-left align-middle font-medium text-zinc-500">
-            Instansi
-          </th>
-          <th className="h-10 min-w-36 px-3 text-left align-middle font-medium text-zinc-500">
-            Kategori
-          </th>
-          <th className="h-10 min-w-32 px-3 text-left align-middle font-medium text-zinc-500">
-            Status
-          </th>
-          <th className="h-10 min-w-36 px-3 text-left align-middle font-medium text-zinc-500">
-            Deadline
-          </th>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <>
+      <div className="space-y-3 p-3 md:hidden">
         {items.map((tender) => (
-          <TenderRow
+          <TenderCard
             key={tender.id}
             tender={tender}
-            href={(tenderId) =>
-              buildQueryUrl(query, { tender: tenderId })
-            }
+            href={tenderHref(tender.id)}
           />
         ))}
-      </TableBody>
-    </Table>
+      </div>
+
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <SortableHead
+                label="Judul"
+                sort={query.sort as TenderSortValue}
+                href={buildQueryUrl(query, {
+                  sort: titleSort,
+                  page: null,
+                })}
+                className="min-w-64"
+              />
+              <th className="h-10 min-w-28 px-3 text-left align-middle font-medium text-zinc-500">
+                Kode
+              </th>
+              <th className="h-10 min-w-40 px-3 text-left align-middle font-medium text-zinc-500">
+                Instansi
+              </th>
+              <th className="h-10 min-w-36 px-3 text-left align-middle font-medium text-zinc-500">
+                Kategori
+              </th>
+              <th className="h-10 min-w-32 px-3 text-left align-middle font-medium text-zinc-500">
+                Status
+              </th>
+              <th className="h-10 min-w-36 px-3 text-left align-middle font-medium text-zinc-500">
+                Deadline
+              </th>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.map((tender) => (
+              <TenderRow
+                key={tender.id}
+                tender={tender}
+                href={tenderHref(tender.id)}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   );
 }

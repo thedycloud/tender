@@ -1,7 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { KeyboardEvent } from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import {
   Tooltip,
@@ -9,31 +7,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { useRowActivation } from "@/hooks/use-row-activation";
 import { formatDate, isExpired } from "@/lib/format";
 import type { TenderListItemDTO } from "@/lib/queries/tenders";
 
 interface TenderRowProps {
   tender: TenderListItemDTO;
-  href: (tenderId: string) => string;
+  href: string;
 }
 
 export function TenderRow({ tender, href }: TenderRowProps) {
-  const router = useRouter();
-
-  const openTender = () => {
-    router.push(href(tender.id));
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLTableRowElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      openTender();
-    }
-    if (event.key === " ") {
-      event.preventDefault();
-      openTender();
-    }
-  };
+  const activation = useRowActivation({ id: tender.id, href });
 
   return (
     <TableRow
@@ -41,8 +25,8 @@ export function TenderRow({ tender, href }: TenderRowProps) {
       tabIndex={0}
       data-tender-id={tender.id}
       aria-label={`Buka tender ${tender.title}`}
-      onClick={openTender}
-      onKeyDown={handleKeyDown}
+      onClick={activation.onClick}
+      onKeyDown={activation.onKeyDown}
       className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-950"
     >
       <TableCell className="min-w-64 max-w-xs font-medium text-zinc-950">
