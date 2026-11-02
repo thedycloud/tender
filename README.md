@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Quickstart
 
-## Getting Started
+## Menjalankan aplikasi
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+```powershell
+bun install
+bun prisma:generate
+bun prisma:validate
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka `http://localhost:3000/dashboard`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variabel environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Butuh `DATABASE_URL`, `DIRECT_URL`, serta konfigurasi Supabase Storage server:
 
-## Learn More
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_STORAGE_BUCKET` (default: `tender-documents`)
 
-To learn more about Next.js, take a look at the following resources:
+Credential tidak boleh disimpan ke Git atau dicetak ke log.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Seed dan benchmark
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```powershell
+bun prisma/seed.ts
+bun run performance:tenders
+```
 
-## Deploy on Vercel
+Seed membuat hingga 520 tender dengan kode `T-0001` sampai `T-0520`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Hasil benchmark lokal dengan database berisi 520 tender:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Daftar halaman 20 record: rata-rata 544 ms untuk lima kali pengukuran
+- Pencarian judul `Jembatan`: rata-rata 299 ms untuk lima kali pengukuran
+
+## Checklist keyboard P1
+
+- Gunakan `Ctrl+K` atau `Cmd+K` untuk memfokuskan pencarian tanpa membuka bilah alamat browser.
+- Tekan `Enter` pada hasil pencarian untuk menerapkan pencarian segera.
+- Tekan `Escape` pada kolom pencarian untuk mengosongkan pencarian.
+- Gunakan `Tab` untuk mencapai status, kategori, tombol tambah, kolom tabel, atau kartu mobile.
+- Buka tender dengan `Enter` atau `Spasi` pada baris/kartu.
+- Dalam drawer, gunakan `Tab` dan `Shift+Tab` untuk berpindah antar kontrol; fokus tetap terjebak dalam drawer.
+- Tutup drawer dengan `Escape`, tombol Tutup, atau klik area gelap; fokus kembali ke baris/kartu yang semula.
+- Pada dialog form, gunakan `Tab` untuk melewati semua field, dan `Escape` untuk menutup jika didukung komponen dialog.
+- Pada dialog konfirmasi hapus, fokus berada pada dialog; konfirmasi hanya dijalankan setelah menekan tombol konfirmasi.
