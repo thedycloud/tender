@@ -1,5 +1,10 @@
+import { Suspense } from "react";
 import { TenderTable } from "@/components/features/tenders/tender-table";
 import { DashboardHeader } from "@/components/features/tenders/dashboard-header";
+import {
+  TenderStatsSkeleton,
+} from "@/components/features/tenders/tender-stats";
+import { TenderStats } from "@/components/features/tenders/tender-stats-data";
 import {
   TenderEmpty,
   TenderNoResults,
@@ -53,6 +58,9 @@ export default async function DashboardPage({
         categorySlug={validCategory?.slug}
         categories={categories}
       />
+      <Suspense fallback={<TenderStatsSkeleton />}>
+        <TenderStats />
+      </Suspense>
       {result.items.length === 0 ? (
         hasFilters ? (
           <TenderNoResults description={filterSummary} />
