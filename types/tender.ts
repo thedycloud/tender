@@ -110,3 +110,11 @@ export interface TenderDetailDTO extends TenderListItemDTO {
   description: string | null;
   documents: TenderDocumentDTO[];
 }
+
+/* ---------- Opsi kategori (untuk filter & form) ---------- */
+
+export type CategoryOption = {
+  id: string;
+  name: string;
+  slug: string;
+};

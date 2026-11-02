@@ -1,9 +1,10 @@
 import { TenderTable } from "@/components/features/tenders/tender-table";
 import { DashboardHeader } from "@/components/features/tenders/dashboard-header";
 import { TenderEmpty } from "@/components/features/tenders/tender-empty";
-import { SearchInput } from "@/components/shared/search-input";
+import { TenderToolbar } from "@/components/features/tenders/tender-toolbar";
 import { Pagination } from "@/components/shared/pagination";
 import { getTenders } from "@/lib/queries/tenders";
+import { getCategories } from "@/lib/queries/categories";
 import { buildTenderUrl } from "@/lib/tender-url";
 import { parseTenderQuery } from "@/schemas/tender-query";
 
@@ -18,10 +19,17 @@ export default async function DashboardPage({
 }: DashboardPageProps) {
   const rawParams = await searchParams;
   const query = parseTenderQuery(rawParams);
+  const categories = await getCategories();
+  const validCategory = query.category
+    ? categories.find(
+        (category) =>
+          category.slug.toLowerCase() === query.category?.toLowerCase(),
+      )
+    : undefined;
   const result = await getTenders({
     q: query.q || undefined,
     status: query.status === "ALL" ? undefined : query.status,
-    category: query.category,
+    category: validCategory?.slug,
     sort: query.sort,
     page: query.page,
   });
@@ -29,9 +37,12 @@ export default async function DashboardPage({
   return (
     <div>
       <DashboardHeader total={result.total} />
-      <div className="border-b px-4 py-3 sm:px-6">
-        <SearchInput initialQuery={query.q} />
-      </div>
+      <TenderToolbar
+        initialQuery={query.q}
+        status={query.status}
+        categorySlug={validCategory?.slug}
+        categories={categories}
+      />
       {result.items.length === 0 ? (
         <TenderEmpty />
       ) : (
