@@ -1,12 +1,19 @@
 import { TenderTable } from "@/components/features/tenders/tender-table";
 import { DashboardHeader } from "@/components/features/tenders/dashboard-header";
-import { TenderEmpty } from "@/components/features/tenders/tender-empty";
+import {
+  TenderEmpty,
+  TenderNoResults,
+} from "@/components/features/tenders/tender-empty";
 import { TenderToolbar } from "@/components/features/tenders/tender-toolbar";
 import { Pagination } from "@/components/shared/pagination";
 import { getTenders } from "@/lib/queries/tenders";
 import { getCategories } from "@/lib/queries/categories";
 import { buildTenderUrl } from "@/lib/tender-url";
 import { parseTenderQuery } from "@/schemas/tender-query";
+import {
+  buildTenderFilterSummary,
+  hasActiveFilters,
+} from "@/lib/tender-filters";
 
 interface DashboardPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -33,6 +40,8 @@ export default async function DashboardPage({
     sort: query.sort,
     page: query.page,
   });
+  const hasFilters = hasActiveFilters(query, validCategory);
+  const filterSummary = buildTenderFilterSummary(query, validCategory);
 
   return (
     <div>
@@ -44,20 +53,26 @@ export default async function DashboardPage({
         categories={categories}
       />
       {result.items.length === 0 ? (
-        <TenderEmpty />
+        hasFilters ? (
+          <TenderNoResults description={filterSummary} />
+        ) : (
+          <TenderEmpty />
+        )
       ) : (
         <TenderTable items={result.items} query={query} />
       )}
-      <div className="border-t px-4 py-4">
-        <Pagination
-          page={result.page}
-          totalPages={result.totalPages}
-          total={result.total}
-          buildHref={(page) =>
-            buildTenderUrl("/dashboard", rawParams, { page })
-          }
-        />
-      </div>
+      {result.items.length > 0 ? (
+        <div className="border-t px-4 py-4">
+          <Pagination
+            page={result.page}
+            totalPages={result.totalPages}
+            total={result.total}
+            buildHref={(page) =>
+              buildTenderUrl("/dashboard", rawParams, { page })
+            }
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
