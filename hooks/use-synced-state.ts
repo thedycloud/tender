@@ -13,6 +13,8 @@ export function useSyncedState<T>(
   const [state, setState] = useState<T>(externalValue);
 
   useEffect(() => {
+    // External URL state intentionally synchronizes the local Select value.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState(externalValue);
   }, [externalValue]);
 

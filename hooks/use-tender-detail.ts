@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { ActionResult, TenderDetailDTO } from "@/types/tender";
+import type { ActionResult } from "@/types/tender";
+import type { TenderDetailDTO } from "../lib/queries/tenders";
 
 export class TenderNotFoundError extends Error {
   constructor() {
