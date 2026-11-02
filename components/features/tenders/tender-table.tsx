@@ -1,56 +1,99 @@
 import {
   Table,
   TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/shared/empty-state";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { formatDate, isExpired } from "@/lib/format";
 import type { TenderListItemDTO } from "@/lib/queries/tenders";
+import type { TenderQuery } from "@/schemas/tender-query";
+import type { TenderSortValue } from "@/lib/tender-sort";
+import { SortableHead } from "./sortable-head";
+import { TenderRow } from "./tender-row";
 
 interface TenderTableProps {
-  tenders: TenderListItemDTO[];
+  items: TenderListItemDTO[];
+  query: TenderQuery;
 }
 
-export function TenderTable({ tenders }: TenderTableProps) {
-  if (tenders.length === 0) {
-    return <EmptyState />;
+function buildQueryUrl(
+  query: TenderQuery,
+  patch: {
+    sort?: TenderSortValue | null;
+    tender?: string | null;
+    page?: number | null;
+  },
+): string {
+  const params = new URLSearchParams();
+
+  if (query.q) params.set("q", query.q);
+  if (query.status !== "ALL") params.set("status", query.status);
+  if (query.category) params.set("category", query.category);
+
+  const sort = patch.sort === undefined ? query.sort : patch.sort;
+  if (sort && sort !== "newest") params.set("sort", sort);
+
+  const page = patch.page === undefined ? query.page : patch.page;
+  if (page && page !== 1) params.set("page", String(page));
+
+  if (patch.tender) params.set("tender", patch.tender);
+
+  const search = params.toString();
+  return search ? `/dashboard?${search}` : "/dashboard";
+}
+
+export function TenderTable({ items, query }: TenderTableProps) {
+  if (items.length === 0) {
+    return (
+      <div className="p-4">
+        <EmptyState
+          variant={query.q || query.status !== "ALL" || query.category ? "no-results" : "initial"}
+        />
+      </div>
+    );
   }
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Judul</TableHead>
-          <TableHead>Kode</TableHead>
-          <TableHead>Instansi</TableHead>
-          <TableHead>Kategori</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Deadline</TableHead>
+          <SortableHead
+            label="Judul"
+            sort={query.sort as TenderSortValue}
+            buildHref={(sort) =>
+              buildQueryUrl(query, {
+                sort,
+                page: null,
+              })
+            }
+            className="min-w-64"
+          />
+          <th className="h-10 min-w-28 px-3 text-left align-middle font-medium text-zinc-500">
+            Kode
+          </th>
+          <th className="h-10 min-w-40 px-3 text-left align-middle font-medium text-zinc-500">
+            Instansi
+          </th>
+          <th className="h-10 min-w-36 px-3 text-left align-middle font-medium text-zinc-500">
+            Kategori
+          </th>
+          <th className="h-10 min-w-32 px-3 text-left align-middle font-medium text-zinc-500">
+            Status
+          </th>
+          <th className="h-10 min-w-36 px-3 text-left align-middle font-medium text-zinc-500">
+            Deadline
+          </th>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {tenders.map((tender) => (
-          <TableRow key={tender.id}>
-            <TableCell className="max-w-xs font-medium text-zinc-950">
-              <span className="block truncate">{tender.title}</span>
-            </TableCell>
-            <TableCell className="font-mono text-xs">
-              {tender.referenceCode}
-            </TableCell>
-            <TableCell>{tender.organization ?? "-"}</TableCell>
-            <TableCell>{tender.category?.name ?? "-"}</TableCell>
-            <TableCell>
-              <StatusBadge
-                status={tender.status}
-                expired={isExpired(tender.deadlineAt, tender.status)}
-              />
-            </TableCell>
-            <TableCell>{formatDate(tender.deadlineAt)}</TableCell>
-          </TableRow>
+        {items.map((tender) => (
+          <TenderRow
+            key={tender.id}
+            tender={tender}
+            href={(tenderId) =>
+              buildQueryUrl(query, { tender: tenderId })
+            }
+          />
         ))}
       </TableBody>
     </Table>

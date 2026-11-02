@@ -25,7 +25,7 @@ export default async function DashboardPage({
 
   return (
     <div>
-      <TenderTable tenders={result.items} />
+      <TenderTable items={result.items} query={query} />
       <div className="border-t px-4 py-4">
         <Pagination
           page={result.page}

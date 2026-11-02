@@ -13,7 +13,11 @@ export const TENDER_SORT_OPTIONS = [
   "oldest",
   "deadline",
   "title",
+  "title_asc",
+  "title_desc",
 ] as const;
+
+export type TenderSort = (typeof TENDER_SORT_OPTIONS)[number];
 
 const firstSearchParam = z.preprocess((value) => {
   if (Array.isArray(value)) {
