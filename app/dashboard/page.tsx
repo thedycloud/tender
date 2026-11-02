@@ -1,4 +1,6 @@
 import { TenderTable } from "@/components/features/tenders/tender-table";
+import { DashboardHeader } from "@/components/features/tenders/dashboard-header";
+import { TenderEmpty } from "@/components/features/tenders/tender-empty";
 import { Pagination } from "@/components/shared/pagination";
 import { getTenders } from "@/lib/queries/tenders";
 import { buildTenderUrl } from "@/lib/tender-url";
@@ -25,7 +27,12 @@ export default async function DashboardPage({
 
   return (
     <div>
-      <TenderTable items={result.items} query={query} />
+      <DashboardHeader total={result.total} />
+      {result.items.length === 0 ? (
+        <TenderEmpty />
+      ) : (
+        <TenderTable items={result.items} query={query} />
+      )}
       <div className="border-t px-4 py-4">
         <Pagination
           page={result.page}
