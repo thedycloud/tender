@@ -15,6 +15,7 @@ import type { ActionResult } from "../../../types/tender";
 export interface UploadTicket {
   path: string;
   token: string;
+  signedUrl: string;
 }
 
 const createUploadTicketSchema = z.object({
@@ -80,6 +81,7 @@ export async function createUploadTicket(
       data: {
         path: data.path ?? path,
         token: data.token,
+        signedUrl: data.signedUrl,
       },
     };
   } catch (error) {
