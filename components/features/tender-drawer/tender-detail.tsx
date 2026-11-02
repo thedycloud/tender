@@ -1,16 +1,47 @@
+"use client";
+
+import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import { StatusBadge } from "../../shared/status-badge";
 import { formatDate, isExpired } from "../../../lib/format";
 import type { TenderDetailDTO } from "../../../lib/queries/tenders";
+import type { CategoryOption } from "../../../types/tender";
 import { DocumentList } from "./document-list";
 import { DocumentUpload } from "./document-upload";
+import { TenderFormDialog } from "../tenders/tender-form-dialog";
+import { ConfirmDialog } from "../../shared/confirm-dialog";
+import { Button } from "../../ui/button";
 
 interface TenderDetailProps {
   tender: TenderDetailDTO;
+  categories: CategoryOption[];
+  onDelete: () => Promise<void>;
 }
 
-export function TenderDetail({ tender }: TenderDetailProps) {
+export function TenderDetail({ tender, categories, onDelete }: TenderDetailProps) {
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function confirmDelete() {
+    setDeleting(true);
+    await onDelete();
+    setDeleting(false);
+    setDeleteOpen(false);
+  }
+
   return (
     <div className="space-y-6 px-6 pb-6">
+      <div className="flex gap-2">
+        <TenderFormDialog
+          categories={categories}
+          tender={tender}
+          triggerLabel="Ubah tender"
+        />
+        <Button type="button" variant="destructive" onClick={() => setDeleteOpen(true)}>
+          <Trash2 aria-hidden="true" />
+          Hapus tender
+        </Button>
+      </div>
       <div>
         <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
           {tender.referenceCode}
@@ -64,6 +95,15 @@ export function TenderDetail({ tender }: TenderDetailProps) {
         <DocumentList tenderId={tender.id} documents={tender.documents} />
         <DocumentUpload tenderId={tender.id} />
       </div>
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Hapus tender?"
+        description={`Tender "${tender.title}" beserta dokumen terkait akan dihapus permanen.`}
+        confirmLabel="Hapus tender"
+        pending={deleting}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

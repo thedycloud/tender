@@ -22,6 +22,17 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(
     tenderParam ? `?tender=${tenderParam}` : "",
   ),
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
+
+vi.mock("@tanstack/react-query", () => ({
+  useQueryClient: () => ({
+    invalidateQueries: vi.fn(),
+  }),
+}));
+
+vi.mock("../../../app/dashboard/actions/tender", () => ({
+  deleteTender: vi.fn(),
 }));
 
 vi.mock("../../../hooks/use-url-state", () => ({
