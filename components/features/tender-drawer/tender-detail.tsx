@@ -1,6 +1,8 @@
 import { StatusBadge } from "../../shared/status-badge";
 import { formatDate, isExpired } from "../../../lib/format";
 import type { TenderDetailDTO } from "../../../lib/queries/tenders";
+import { DocumentList } from "./document-list";
+import { DocumentUpload } from "./document-upload";
 
 interface TenderDetailProps {
   tender: TenderDetailDTO;
@@ -59,9 +61,8 @@ export function TenderDetail({ tender }: TenderDetailProps) {
         <h3 className="text-sm font-semibold text-zinc-950">
           Dokumen ({tender.documents.length})
         </h3>
-        {tender.documents.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-600">Belum ada dokumen</p>
-        ) : null}
+        <DocumentList tenderId={tender.id} documents={tender.documents} />
+        <DocumentUpload tenderId={tender.id} />
       </div>
     </div>
   );
