@@ -63,4 +63,25 @@ describe("SearchInput", () => {
     expect(document.activeElement).toBe(input);
     expect(input).toHaveValue("");
   });
+
+  it("debounces a typed query by 300 ms", () => {
+    vi.useFakeTimers();
+    render(<SearchInput />);
+    const input = screen.getByRole("searchbox");
+
+    fireEvent.change(input, { target: { value: "pengadaan laptop" } });
+    expect(replace).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(299);
+    });
+    expect(replace).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(replace).toHaveBeenCalledWith("/dashboard?q=pengadaan+laptop", {
+      scroll: false,
+    });
+  });
 });
