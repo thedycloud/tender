@@ -17,6 +17,8 @@ export function SearchInput({ initialQuery = "" }: SearchInputProps) {
   const urlState = useUrlState();
 
   useEffect(() => {
+    // Props synchronize browser navigation with the controlled draft.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft(initialQuery);
   }, [initialQuery]);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { KeyboardEvent, MouseEvent } from "react";
+import type { KeyboardEvent } from "react";
 
 export interface RowActivationOptions {
   id: string;
@@ -15,7 +15,7 @@ export function useRowActivation({ href }: RowActivationOptions) {
     router.push(href);
   };
 
-  const onClick = (_event: MouseEvent<HTMLElement>) => {
+  const onClick = () => {
     activate();
   };
 
