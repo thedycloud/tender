@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { ErrorState } from "../../shared/error-state";
 import { EmptyState } from "../../shared/empty-state";
@@ -19,6 +20,7 @@ import {
 } from "../../../hooks/use-tender-detail";
 import { tenderIdSchema } from "../../../schemas/tender-id";
 import { TenderDetail } from "./tender-detail";
+import { captureTenderFocus, restoreTenderFocus } from "../../../lib/focus";
 
 export function TenderDrawer() {
   const searchParams = useSearchParams();
@@ -27,8 +29,22 @@ export function TenderDrawer() {
   const parsedId = tenderIdSchema.safeParse(rawId);
   const tenderId = parsedId.success ? parsedId.data : null;
   const detail = useTenderDetail(tenderId);
+  const previousTenderId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (tenderId && tenderId !== previousTenderId.current) {
+      captureTenderFocus(tenderId);
+    }
+    if (previousTenderId.current && previousTenderId.current !== tenderId) {
+      restoreTenderFocus(previousTenderId.current);
+    }
+    previousTenderId.current = tenderId;
+  }, [tenderId]);
 
   function closeDrawer() {
+    if (tenderId) {
+      restoreTenderFocus(tenderId);
+    }
     urlState.remove("tender", { mode: "replace", scroll: false });
   }
 
