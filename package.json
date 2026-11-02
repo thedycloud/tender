@@ -9,10 +9,12 @@
     "lint": "eslint",
     "test": "vitest run",
     "storage:reconcile": "bun scripts/reconcile-storage.ts",
+    "performance:tenders": "bun scripts/benchmark-tenders.ts",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate"
   },
   "dependencies": {
+    "@hookform/resolvers": "^7.0.1",
     "@prisma/client": "6.19.0",
     "@radix-ui/react-alert-dialog": "^1.2.1",
     "@radix-ui/react-checkbox": "^1.4.1",
