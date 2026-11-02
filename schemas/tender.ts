@@ -37,7 +37,7 @@ const deadline = z.union([
   z.date({ message: "Tanggal deadline tidak valid" }),
 ]);
 
-const normalizedTenderFormSchema = z.object({
+export const normalizedTenderFormSchema = z.object({
   referenceCode: requiredText("Kode tender"),
   title: requiredText("Judul tender"),
   organization: requiredText("Instansi"),

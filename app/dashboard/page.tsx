@@ -20,6 +20,7 @@ import {
   hasActiveFilters,
 } from "@/lib/tender-filters";
 import { TenderDrawer } from "@/components/features/tender-drawer/tender-drawer";
+import { TenderFormDialog } from "@/components/features/tenders/tender-form-dialog";
 
 interface DashboardPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -52,6 +53,9 @@ export default async function DashboardPage({
   return (
     <div>
       <DashboardHeader total={result.total} />
+      <div className="flex justify-end border-b px-4 py-3 sm:px-6">
+        <TenderFormDialog categories={categories} />
+      </div>
       <TenderToolbar
         initialQuery={query.q}
         status={query.status}
@@ -82,7 +86,7 @@ export default async function DashboardPage({
           />
         </div>
       ) : null}
-      <TenderDrawer />
+      <TenderDrawer categories={categories} />
     </div>
   );
 }
