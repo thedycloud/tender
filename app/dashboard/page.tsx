@@ -14,6 +14,7 @@ import {
   buildTenderFilterSummary,
   hasActiveFilters,
 } from "@/lib/tender-filters";
+import { TenderDrawer } from "@/components/features/tender-drawer/tender-drawer";
 
 interface DashboardPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -73,6 +74,7 @@ export default async function DashboardPage({
           />
         </div>
       ) : null}
+      <TenderDrawer />
     </div>
   );
 }
