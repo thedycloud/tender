@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { ErrorState } from "../../shared/error-state";
 import { EmptyState } from "../../shared/empty-state";
 import { Button } from "../../ui/button";
@@ -21,10 +23,14 @@ import {
 import { tenderIdSchema } from "../../../schemas/tender-id";
 import { TenderDetail } from "./tender-detail";
 import { captureTenderFocus, restoreTenderFocus } from "../../../lib/focus";
+import { deleteTender } from "../../../app/dashboard/actions/tender";
+import type { CategoryOption } from "../../../types/tender";
 
-export function TenderDrawer() {
+export function TenderDrawer({ categories = [] }: { categories?: CategoryOption[] }) {
   const searchParams = useSearchParams();
   const urlState = useUrlState();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const rawId = searchParams.get("tender");
   const parsedId = tenderIdSchema.safeParse(rawId);
   const tenderId = parsedId.success ? parsedId.data : null;
@@ -46,6 +52,15 @@ export function TenderDrawer() {
       restoreTenderFocus(tenderId);
     }
     urlState.remove("tender", { mode: "replace", scroll: false });
+  }
+
+  async function deleteOpenedTender() {
+    if (!tenderId) return;
+    const result = await deleteTender(tenderId);
+    if (!result.ok) return;
+    await queryClient.invalidateQueries({ queryKey: ["tender-detail", tenderId] });
+    closeDrawer();
+    router.refresh();
   }
 
   if (!tenderId) {
@@ -95,7 +110,13 @@ export function TenderDrawer() {
           )
         ) : null}
 
-        {detail.data ? <TenderDetail tender={detail.data} /> : null}
+        {detail.data ? (
+          <TenderDetail
+            tender={detail.data}
+            categories={categories}
+            onDelete={deleteOpenedTender}
+          />
+        ) : null}
       </SheetContent>
     </Sheet>
   );
