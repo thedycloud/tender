@@ -53,7 +53,7 @@ export function SearchInput({ initialQuery = "" }: SearchInputProps) {
   const pending = draft !== debouncedDraft;
 
   return (
-    <div className="relative max-w-md">
+    <div className="relative w-full">
       <Search
         aria-hidden="true"
         className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500"
@@ -73,9 +73,9 @@ export function SearchInput({ initialQuery = "" }: SearchInputProps) {
             clearSearch();
           }
         }}
-        aria-label="Cari tender"
-        placeholder="Cari tender..."
-        className="h-10 pl-9 pr-20"
+        aria-label="Cari dokumen tender"
+        placeholder="Cari nomor dokumen, nama tender, instansi..."
+        className="h-10 w-full rounded-md border border-zinc-300 bg-white pl-9 pr-20 text-xs text-zinc-800 outline-none focus:border-[#5b67f1] focus:ring-2 focus:ring-[#5b67f1]/10"
       />
       <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
         {pending ? (

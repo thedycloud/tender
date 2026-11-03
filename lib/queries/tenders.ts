@@ -103,6 +103,7 @@ export async function getTenders(
 
       return { count, records, pagination };
     },
+    { timeout: 20_000 },
   );
 
   return {

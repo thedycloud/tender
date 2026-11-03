@@ -66,28 +66,14 @@ export function TenderToolbar({
   }
 
   return (
-    <div className="border-b px-4 py-3 sm:px-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center">
-        <div className="w-full md:max-w-md">
+    <div className="mb-4 rounded-lg border border-zinc-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.02)]">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+        <div className="w-full xl:max-w-[460px]">
           <SearchInput initialQuery={initialQuery} />
         </div>
-
-        <Select value={syncedStatus} onValueChange={changeStatus}>
-          <SelectTrigger aria-label="Filter status" className="w-full md:w-44">
-            <SelectValue placeholder="Semua status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">Semua status</SelectItem>
-            {TENDER_STATUSES.map((value) => (
-              <SelectItem key={value} value={value}>
-                {TENDER_STATUS_PRESENTATION[value].label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
+        <div className="flex flex-wrap gap-2 xl:ml-auto">
         <Select value={syncedCategory} onValueChange={changeCategory}>
-          <SelectTrigger aria-label="Filter kategori" className="w-full md:w-52">
+          <SelectTrigger aria-label="Filter kategori" className="h-9 w-full rounded-md border-zinc-200 text-xs md:w-36">
             <SelectValue placeholder="Semua kategori" />
           </SelectTrigger>
           <SelectContent>
@@ -99,18 +85,45 @@ export function TenderToolbar({
             ))}
           </SelectContent>
         </Select>
-
+        <Select value="ALL" onValueChange={() => undefined}>
+          <SelectTrigger aria-label="Filter tanggal" className="h-9 w-full rounded-md border-zinc-200 text-xs md:w-36">
+            <SelectValue placeholder="Semua Tanggal" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Semua Tanggal</SelectItem>
+            <SelectItem value="7">7 hari terakhir</SelectItem>
+            <SelectItem value="30">30 hari terakhir</SelectItem>
+          </SelectContent>
+        </Select>
         {hasActiveFilter ? (
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full md:w-auto"
-            onClick={resetFilters}
-          >
-            <X aria-hidden="true" />
-            Reset filter
+          <Button type="button" variant="ghost" className="h-9 rounded-md text-xs text-zinc-500" onClick={resetFilters}>
+            <X className="size-3" aria-hidden="true" /> Reset
           </Button>
         ) : null}
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2 border-t border-zinc-100 pt-3">
+        {[
+          { value: "ALL", label: "Semua" },
+          { value: "DRAFT", label: "Draft" },
+          { value: "CLOSING_SOON", label: "Menunggu Review" },
+          { value: "OPEN", label: "Disetujui" },
+          { value: "CANCELLED", label: "Ditolak" },
+        ].map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => changeStatus(tab.value)}
+            className={`h-8 rounded-full px-3 text-xs ${
+              syncedStatus === tab.value
+                ? "bg-[#4f46e5] font-semibold text-white"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
     </div>
   );
