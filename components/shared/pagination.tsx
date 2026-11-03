@@ -26,11 +26,11 @@ export function Pagination({
         className,
       )}
     >
-      <p className="text-sm text-zinc-600" aria-live="polite">
-        Halaman {page} dari {totalPages} · {total} tender
+      <p className="text-xs text-zinc-500" aria-live="polite">
+        Menampilkan {Math.min(total, ((page - 1) * 12) + 1)}–{Math.min(total, page * 12)} dari {total} dokumen
       </p>
-      <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
-        <Button variant="outline" size="sm" disabled={page <= 1} asChild={page > 1}>
+      <div className="flex items-center gap-1.5">
+        <Button className="h-9 px-2.5 text-xs" variant="outline" size="sm" disabled={page <= 1} asChild={page > 1}>
           {page > 1 ? (
             <Link href={buildHref(page - 1)} aria-label="Halaman sebelumnya">
               <ChevronLeft aria-hidden="true" />
@@ -43,7 +43,19 @@ export function Pagination({
             </>
           )}
         </Button>
+        {[...new Set([1, page, Math.min(page + 1, totalPages)].filter((value) => value >= 1 && value <= totalPages))].slice(0, 3).map((value) => (
+          <Button
+            key={value}
+            variant={value === page ? "default" : "outline"}
+            size="sm"
+            className="size-9 p-0 text-xs"
+            asChild={value !== page}
+          >
+            {value !== page ? <Link href={buildHref(value)} aria-label={`Halaman ${value}`}>{value}</Link> : <>{value}</>}
+          </Button>
+        ))}
         <Button
+          className="h-9 px-2.5 text-xs"
           variant="outline"
           size="sm"
           disabled={page >= totalPages}

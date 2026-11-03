@@ -20,7 +20,6 @@ import {
   hasActiveFilters,
 } from "@/lib/tender-filters";
 import { TenderDrawer } from "@/components/features/tender-drawer/tender-drawer";
-import { TenderFormDialog } from "@/components/features/tenders/tender-form-dialog";
 
 interface DashboardPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -52,40 +51,39 @@ export default async function DashboardPage({
 
   return (
     <div>
-      <DashboardHeader total={result.total} />
-      <div className="flex justify-end border-b px-4 py-3 sm:px-6">
-        <TenderFormDialog categories={categories} />
-      </div>
+      <DashboardHeader total={result.total} categories={categories} />
+      <Suspense fallback={<TenderStatsSkeleton />}>
+        <TenderStats />
+      </Suspense>
       <TenderToolbar
         initialQuery={query.q}
         status={query.status}
         categorySlug={validCategory?.slug}
         categories={categories}
       />
-      <Suspense fallback={<TenderStatsSkeleton />}>
-        <TenderStats />
-      </Suspense>
-      {result.items.length === 0 ? (
-        hasFilters ? (
-          <TenderNoResults description={filterSummary} />
+      <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+        {result.items.length === 0 ? (
+          hasFilters ? (
+            <TenderNoResults description={filterSummary} />
+          ) : (
+            <TenderEmpty />
+          )
         ) : (
-          <TenderEmpty />
-        )
-      ) : (
-        <TenderTable items={result.items} query={query} />
-      )}
-      {result.items.length > 0 ? (
-        <div className="border-t px-4 py-4">
-          <Pagination
-            page={result.page}
-            totalPages={result.totalPages}
-            total={result.total}
-            buildHref={(page) =>
-              buildTenderUrl("/dashboard", rawParams, { page })
-            }
-          />
-        </div>
-      ) : null}
+          <TenderTable items={result.items} query={query} />
+        )}
+        {result.items.length > 0 ? (
+          <div className="border-t border-zinc-200 px-4 py-3">
+            <Pagination
+              page={result.page}
+              totalPages={result.totalPages}
+              total={result.total}
+              buildHref={(page) =>
+                buildTenderUrl("/dashboard", rawParams, { page })
+              }
+            />
+          </div>
+        ) : null}
+      </div>
       <TenderDrawer categories={categories} />
     </div>
   );

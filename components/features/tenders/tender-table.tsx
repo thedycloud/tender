@@ -79,8 +79,11 @@ export function TenderTable({ items, query }: TenderTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
+              <th className="h-10 w-10 px-3 text-left align-middle">
+                <input type="checkbox" aria-label="Pilih semua dokumen" className="size-3.5 rounded border-zinc-300" />
+              </th>
               <SortableHead
-                label="Judul"
+                label="NO. DOKUMEN & NAMA TENDER"
                 sort={query.sort as TenderSortValue}
                 href={buildQueryUrl(query, {
                   sort: titleSort,
@@ -88,20 +91,16 @@ export function TenderTable({ items, query }: TenderTableProps) {
                 })}
                 className="min-w-64"
               />
-              <th className="h-10 min-w-28 px-3 text-left align-middle font-medium text-zinc-500">
-                Kode
+              <th className="h-10 min-w-44 px-3 text-left align-middle text-[10px] font-bold uppercase tracking-[0.04em] text-zinc-500">
+                KATEGORI & INSTANSI
               </th>
-              <th className="h-10 min-w-40 px-3 text-left align-middle font-medium text-zinc-500">
-                Instansi
+              <th className="h-10 min-w-36 px-3 text-left align-middle text-[10px] font-bold uppercase tracking-[0.04em] text-zinc-500">
+                DEADLINE
               </th>
-              <th className="h-10 min-w-36 px-3 text-left align-middle font-medium text-zinc-500">
-                Kategori
+              <th className="h-10 min-w-28 px-3 text-left align-middle text-[10px] font-bold uppercase tracking-[0.04em] text-zinc-500">
+                STATUS
               </th>
-              <th className="h-10 min-w-32 px-3 text-left align-middle font-medium text-zinc-500">
-                Status
-              </th>
-              <th className="h-10 min-w-36 px-3 text-left align-middle font-medium text-zinc-500">
-                Deadline
+              <th className="h-10 w-12 px-3 text-left align-middle">
               </th>
             </TableRow>
           </TableHeader>

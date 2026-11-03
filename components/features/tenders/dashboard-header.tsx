@@ -1,20 +1,23 @@
+import type { CategoryOption } from "@/types/tender";
+import { TenderFormDialog } from "./tender-form-dialog";
+
 interface DashboardHeaderProps {
   total: number;
+  categories?: CategoryOption[];
 }
 
-export function DashboardHeader({ total }: DashboardHeaderProps) {
+export function DashboardHeader({ total, categories = [] }: DashboardHeaderProps) {
   return (
-    <div className="border-b px-4 py-5 sm:px-6">
-      <p
-        id="dashboard-page-title"
-        tabIndex={-1}
-        className="text-sm font-medium text-zinc-950 outline-none"
-      >
-        Daftar Tender
-      </p>
-      <p className="mt-1 text-sm text-zinc-600">
-        {total} tender tersedia
-      </p>
+    <div className="mb-5 flex items-end justify-between gap-4">
+      <div>
+        <h1 id="dashboard-page-title" tabIndex={-1} className="text-[22px] font-bold leading-tight text-zinc-950 outline-none">
+          Daftar Dokumen Tender
+        </h1>
+        <p className="mt-1 text-xs text-zinc-500">
+          Kelola, tinjau, dan pantau seluruh dokumen lelang pengadaan Anda.
+        </p>
+      </div>
+      <TenderFormDialog categories={categories} triggerLabel="Unggah Dokumen Baru" />
     </div>
   );
 }
